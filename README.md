@@ -1,101 +1,36 @@
-# Signal Clone — Production Deployment Guide & Documentation
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A real-time, privacy-focused secure messaging web application built with **Next.js 16 (React 19)**, **Vanilla CSS / TailwindCSS**, **FastAPI**, **SQLAlchemy**, and **WebSockets**.
+## Getting Started
 
----
+First, run the development server:
 
-## Architecture Overview
-
-- **Frontend**: Next.js (App Router, TypeScript) deployed on **Vercel**.
-- **Backend**: FastAPI (Python 3.11+), Uvicorn ASGI server, WebSockets engine deployed on **Render**.
-- **Database**: SQLite with SQLAlchemy ORM (persistent disk support on Render).
-- **Authentication**: JWT token-based authentication stored in `localStorage`.
-
----
-
-## Deployment Configuration & Environment Variables
-
-### 1. Backend Environment Variables (Render)
-
-Configure these in the Render Dashboard (`Environment` tab) or via `backend/.env.example`:
-
-| Environment Variable | Recommended Production Value | Description |
-| :--- | :--- | :--- |
-| `SECRET_KEY` | `[Random 64-char string]` | Secret key used to sign JWT tokens |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `43200` | Token expiration (30 days) |
-| `DATABASE_URL` | `sqlite:////var/data/signal.db` | SQLite database filepath (`/var/data` on persistent disk) |
-| `ALLOWED_ORIGINS` | `https://your-app.vercel.app` | Comma-separated CORS allowed origins |
-
-### 2. Frontend Environment Variables (Vercel)
-
-Configure these in the Vercel Project Settings (`Environment Variables` tab) or via `frontend/.env.example`:
-
-| Environment Variable | Production Value Example | Description |
-| :--- | :--- | :--- |
-| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` | Base HTTP/HTTPS URL of Render backend |
-| `NEXT_PUBLIC_WS_URL` | `wss://your-backend.onrender.com` | Base WS/WSS WebSocket URL of Render backend |
-
----
-
-## Step-by-Step Production Deployment Instructions
-
-### A. Deploy Backend to Render
-
-1. **Push Repository**: Push project to GitHub/GitLab repository.
-2. **Create New Web Service**:
-   - Go to [Render Dashboard](https://dashboard.render.com/) -> **New** -> **Web Service**.
-   - Connect your GitHub repository.
-3. **Configure Build & Start Settings**:
-   - **Environment**: Python 3
-   - **Build Command**: `pip install -r backend/requirements.txt`
-   - **Start Command**: `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-4. **Environment Variables**:
-   - Add `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `DATABASE_URL`, and `ALLOWED_ORIGINS`.
-5. **Persistent Disk (Optional for Free Tier / Recommended for Paid)**:
-   - Mount disk at `/var/data` and set `DATABASE_URL=sqlite:////var/data/signal.db`.
-
----
-
-### B. Deploy Frontend to Vercel
-
-1. **Import Project**:
-   - Go to [Vercel Dashboard](https://vercel.com/new) -> Import Git Repository.
-2. **Configure Framework & Root Directory**:
-   - Framework Preset: **Next.js**
-   - Root Directory: `frontend`
-3. **Environment Variables**:
-   - Set `NEXT_PUBLIC_API_URL` to `https://your-backend.onrender.com`
-   - Set `NEXT_PUBLIC_WS_URL` to `wss://your-backend.onrender.com`
-4. **Deploy**:
-   - Click **Deploy**. Vercel will build the application using `npm run build`.
-
----
-
-## SQLite & Database Persistence Considerations
-
-1. **Render Free Tier Ephemeral Disks**:
-   - Render's free tier spins down after inactivity and wipes transient files.
-   - To persist SQLite data across restarts, add a **1GB Persistent Disk** in Render mounted at `/var/data`.
-2. **Multi-Instance Scaling**:
-   - SQLite is single-file. If horizontal scaling (multiple backend instances) is required in the future, migrate `DATABASE_URL` to a hosted PostgreSQL instance (`postgresql://user:pass@host/db`).
-
----
-
-## Local Development & Testing Commands
-
-### Backend Startup
 ```bash
-cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-### Frontend Startup
-```bash
-cd frontend
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Automated Real-Time Verification Suite
-```bash
-python scratch/test_realtime.py
-```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
