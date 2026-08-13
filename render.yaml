@@ -1,0 +1,22 @@
+# Render Blueprint specification for FastAPI + WebSockets Web Service
+services:
+  - type: web
+    name: signal-clone-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 43200
+      - key: DATABASE_URL
+        value: sqlite:////var/data/signal.db
+      - key: ALLOWED_ORIGINS
+        value: "*"
+    disk:
+      name: sqlite-data
+      mountPath: /var/data
+      sizeGB: 1
